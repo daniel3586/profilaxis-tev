@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profilaxis TEV Oncológica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+[hidden]{display:none!important}
+body{margin:0}
+img{max-width:100%}
+/* Layout: hoja de prescripción — formulario por secciones a la izquierda, pauta resultante fija a la derecha; una columna en móvil */
+:root {
+  --bg: #F6F7F9; --surface: #FFFFFF; --sunken: #EEF1F5; --line: #D9DEE6;
+  --fg: #1C2331; --muted: #5B6578; --navy: #1B2A41; --accent: #B3122E; --accent-soft: #FBE9EC;
+  --ok: #1F7A6E; --ok-soft: #E1F2EF; --warn: #9A5B00; --warn-soft: #FDF1DC; --crit: #B3122E; --crit-soft: #FBE9EC; --info: #2D4E7E; --info-soft: #E6EDF7;
+  --tag: #E9A23B; --on-accent: #FFFFFF;
+  --f-display: "Source Serif 4", Cambria, Georgia, serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F1520; --surface: #172030; --sunken: #1E293B; --line: #2C384C;
+  --fg: #E6EAF1; --muted: #9AA6BA; --navy: #C9D6EA; --accent: #F0566E; --accent-soft: #3A1A22;
+  --ok: #5CC4B4; --ok-soft: #13312D; --warn: #F2B65A; --warn-soft: #3A2C12; --crit: #F0566E; --crit-soft: #3A1A22; --info: #8DB2EA; --info-soft: #1A2840;
+  --tag: #E9A23B; --on-accent: #0F1520; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0F1520; --surface: #172030; --sunken: #1E293B; --line: #2C384C;
+  --fg: #E6EAF1; --muted: #9AA6BA; --navy: #C9D6EA; --accent: #F0566E; --accent-soft: #3A1A22;
+  --ok: #5CC4B4; --ok-soft: #13312D; --warn: #F2B65A; --warn-soft: #3A2C12; --crit: #F0566E; --crit-soft: #3A1A22; --info: #8DB2EA; --info-soft: #1A2840;
+  --tag: #E9A23B; --on-accent: #0F1520; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--f-body); padding-inline: 16px; padding-block: 20px 40px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(26px, 4vw, 34px)/1.15 var(--f-display); color: var(--navy); margin: 4px 0 0; text-wrap: balance; }
+.lede { color: var(--muted); margin: 6px 0 0; max-width: 62ch; }
+.example { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--info-soft); color: var(--info); border-radius: var(--r); padding: 10px 14px; font-size: 14px; }
+.example b { font-weight: 600; }
+button { font: 600 14px var(--f-body); border-radius: 8px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+form { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+fieldset { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 16px 18px 18px; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+legend { font: 700 17px var(--f-display); color: var(--navy); padding: 0 6px; margin-left: -6px; }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+label.f { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 500; color: var(--muted); min-width: 0; }
+input[type=number], input[type=date], select { font: 500 15px var(--f-body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0; }
+input[type=number] { font-family: var(--f-mono); }
+.derived { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 600 12.5px var(--f-mono); background: var(--sunken); color: var(--fg); border-radius: 999px; padding: 4px 10px; }
+.chip span { color: var(--muted); font-family: var(--f-body); font-weight: 500; margin-right: 4px; }
+.hint { font-size: 12.5px; color: var(--muted); margin: 0; }
+
+.checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 6px 14px; }
+.ck { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; cursor: pointer; padding: 3px 0; }
+.ck input { margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; flex: none; }
+.ck .pts { font: 600 11px var(--f-mono); color: var(--muted); background: var(--sunken); border-radius: 4px; padding: 1px 5px; margin-left: auto; flex: none; }
+details.cap { border-top: 1px solid var(--line); padding-top: 10px; }
+details.cap summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--navy); }
+details.cap .group { margin-top: 10px; }
+.gtitle { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 0 0 4px; }
+.auto { font-size: 13px; color: var(--muted); background: var(--sunken); border-radius: 8px; padding: 8px 10px; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg label { cursor: pointer; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: inline-block; border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; font-size: 14px; background: var(--surface); }
+.seg input:checked + span { background: var(--navy); color: var(--surface); border-color: var(--navy); font-weight: 600; }
+.seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* resultado */
+aside { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+@media (max-width: 860px) { aside { position: static; } }
+.rx { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.rx-head { background: var(--navy); color: var(--surface); padding: 14px 18px; display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+.rx-head h2 { font: 700 19px var(--f-display); margin: 0; }
+.status { font-size: 12.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 999px; padding: 4px 10px; }
+.s-ok { background: var(--ok-soft); color: var(--ok); } .s-warn { background: var(--warn-soft); color: var(--warn); } .s-crit { background: var(--crit-soft); color: var(--crit); } .s-info { background: var(--info-soft); color: var(--info); }
+.rx-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+.cap-score { display: flex; align-items: center; gap: 14px; }
+.cap-num { font: 600 40px/1 var(--f-mono); color: var(--accent); min-width: 2ch; }
+.cap-score .lbl { font-size: 13px; color: var(--muted); }
+.cap-score .cat { font-weight: 700; font-size: 16px; }
+.line { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; }
+.line dt { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding-top: 2px; }
+.line dd { margin: 0; min-width: 0; }
+.dose { font: 700 22px/1.25 var(--f-display); color: var(--navy); }
+.sub { font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+.tag { display: inline-block; font: 700 10.5px var(--f-body); letter-spacing: .06em; background: var(--tag); color: #1C2331; border-radius: 999px; padding: 2px 8px; vertical-align: middle; margin-left: 4px; }
+.alerts { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.alerts li { border-radius: 8px; padding: 9px 12px; font-size: 14px; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 6px; }
+.alerts li::before { content: attr(data-mark); font-weight: 700; font-family: var(--f-mono); }
+.a-crit { background: var(--crit-soft); color: var(--crit); } .a-warn { background: var(--warn-soft); color: var(--warn); } .a-info { background: var(--sunken); color: var(--fg); } .a-ok { background: var(--ok-soft); color: var(--ok); }
+.alerts li b { font-weight: 700; }
+.report { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
+.report h3 { font: 700 16px var(--f-display); color: var(--navy); margin: 0; }
+.report textarea { width: 100%; min-height: 128px; font: 14px/1.5 var(--f-body); color: var(--fg); background: var(--sunken); border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; }
+.report .act { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.copied { font-size: 13px; color: var(--ok); }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 6px; max-width: 90ch; }
+footer b { color: var(--fg); }
+@media (prefers-reduced-motion: no-preference) { .rx-body > * { transition: opacity .15s; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Unidad COPER · HUV Virgen del Rocío</div>
+      <h1>Profilaxis antitrombótica en cirugía oncológica</h1>
+      <p class="lede">Introduce los datos del paciente. La pauta con Inhixa® (enoxaparina) se recalcula al momento, con el Caprini y las situaciones especiales.</p>
+    </div>
+  </header>
+
+
+  <div class="grid">
+    <form id="f" autocomplete="off" novalidate>
+      <fieldset>
+        <legend>Paciente</legend>
+        <div class="row">
+          <label class="f">Edad (años)<input type="number" id="edad" min="18" max="110" inputmode="numeric"></label>
+          <label class="f">Sexo
+            <select id="sexo"><option value="F">Mujer</option><option value="M">Varón</option></select></label>
+          <label class="f">Peso (kg)<input type="number" id="peso" min="25" max="300" step="0.1" inputmode="decimal"></label>
+          <label class="f">Talla (cm)<input type="number" id="talla" min="120" max="220" inputmode="numeric"></label>
+        </div>
+        <div class="row">
+          <label class="f">Creatinina (mg/dl)<input type="number" id="cr" min="0.2" max="15" step="0.01" inputmode="decimal"></label>
+          <label class="f">Plaquetas (×10³/µL)<input type="number" id="plaq" min="0" max="2000" inputmode="numeric"></label>
+        </div>
+        <div class="derived" aria-live="polite">
+          <span class="chip"><span>IMC</span><b id="dImc">—</b></span>
+          <span class="chip"><span>ClCr (Cockcroft-Gault)</span><b id="dClcr">—</b></span>
+        </div>
+        <p class="hint">ClCr con el peso real: en obesidad sobreestima la función renal.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Cirugía</legend>
+        <div class="row">
+          <label class="f">Tipo de intervención
+            <select id="tipo">
+              <option value="">Selecciona…</option>
+              <option value="crs">CRS-HIPEC</option>
+              <option value="abdpelA">Oncológica abdominopélvica mayor · abierta</option>
+              <option value="abdpelL">Oncológica abdominopélvica mayor · laparoscópica</option>
+              <option value="otra">Otra cirugía oncológica mayor (> 45 min)</option>
+              <option value="menor">Cirugía menor (< 45 min)</option>
+            </select></label>
+          <label class="f">Fecha de la intervención<input type="date" id="fecha"></label>
+        </div>
+        <label class="ck"><input type="checkbox" id="epidural"> Catéter epidural o anestesia neuroaxial</label>
+        <label class="ck"><input type="checkbox" id="reint"> Reintervención</label>
+        <label class="f" id="wrapReint" hidden>Fecha de la última intervención<input type="date" id="fechaReint"></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Riesgo hemorrágico y contraindicaciones</legend>
+        <div class="checks">
+          <label class="ck"><input type="checkbox" id="sangrado"> Sangrado activo</label>
+          <label class="ck"><input type="checkbox" id="coag"> Coagulopatía no corregida</label>
+          <label class="ck"><input type="checkbox" id="altoHem"> Otro alto riesgo hemorrágico (doble antiagregación, hepatopatía grave…)</label>
+          <label class="ck"><input type="checkbox" id="tih"> Antecedente de trombocitopenia inducida por heparina</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Anticoagulación previa</legend>
+        <div class="seg" role="radiogroup" aria-label="Anticoagulación previa">
+          <label><input type="radio" name="ac" value="no" checked><span>Ninguna</span></label>
+          <label><input type="radio" name="ac" value="acod"><span>ACOD</span></label>
+          <label><input type="radio" name="ac" value="avk"><span>Acenocumarol / warfarina</span></label>
+          <label><input type="radio" name="ac" value="hbpm"><span>HBPM terapéutica</span></label>
+        </div>
+        <label class="ck" id="wrapAltoTromb" hidden><input type="checkbox" id="altoTromb"> Alto riesgo trombótico (prótesis valvular mecánica, TEV en los últimos 3 meses…)</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Escala de Caprini</legend>
+        <div class="auto" id="capAuto">Calculado automáticamente: —</div>
+        <details class="cap" id="capDetails">
+          <summary>Otros factores de riesgo (<span id="capManualCount">0</span> marcados)</summary>
+          <div id="capGroups"></div>
+        </details>
+      </fieldset>
+    </form>
+
+    <aside aria-live="polite">
+      <section class="rx">
+        <div class="rx-head"><h2>Pauta recomendada</h2><span class="status" id="status">—</span></div>
+        <div class="rx-body">
+          <div class="cap-score">
+            <div class="cap-num" id="capNum">—</div>
+            <div><div class="lbl">Caprini</div><div class="cat" id="capCat">—</div></div>
+          </div>
+          <dl class="line"><dt>Dosis</dt><dd><div class="dose" id="oDose">—</div><div class="sub" id="oDoseSub"></div></dd></dl>
+          <dl class="line"><dt>Inicio</dt><dd id="oStart">—</dd></dl>
+          <dl class="line"><dt>Duración</dt><dd><div id="oDur">—</div><div class="sub" id="oDurSub"></div></dd></dl>
+          <dl class="line"><dt>Avisos</dt><dd><ul class="alerts" id="oAlerts"></ul></dd></dl>
+        </div>
+      </section>
+      <section class="report">
+        <h3>Texto para el informe de alta</h3>
+        <textarea id="oReport" aria-label="Texto para el informe de alta"></textarea>
+        <div class="act"><button type="button" class="primary" id="btnCopy">Copiar texto</button><span class="copied" id="copied" hidden>Copiado</span></div>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <div><b>Herramienta de apoyo a la decisión.</b> No sustituye al juicio clínico ni a los protocolos del hospital. No se guarda ningún dato: todo se calcula en este navegador.</div>
+    <div>Basada en la ficha técnica de Inhixa® (CIMA-AEMPS), ITAC 2022 (Lancet Oncol), ASCO 2023 (J Clin Oncol), ASRA 2018 para anestesia neuroaxial y la escala de Caprini (2005). Lo marcado como <span class="tag">OFF-LABEL</span> está fuera de ficha técnica; lo marcado como «criterio clínico» no procede de guías.</div>
+    <div>Versión 1 · octubre 2026</div>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const num = id => { const v = parseFloat(String($(id).value).replace(',', '.')); return isFinite(v) ? v : null; };
+  const fmt = (v, d = 0) => v == null ? '—' : v.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const fdate = d => d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d; };
+  const todayISO = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+
+  // Caprini: factores manuales (edad, IMC, cáncer y tipo de cirugía se puntúan automáticamente)
+  const CAP = [
+    { p: 1, t: '1 punto', items: [['varices', 'Varices'], ['eii', 'Enfermedad inflamatoria intestinal'], ['edema', 'Edema actual de miembros inferiores'], ['cirPrev', 'Cirugía mayor en el último mes'], ['iam', 'Infarto agudo de miocardio'], ['icc', 'Insuficiencia cardiaca (< 1 mes)'], ['sepsis', 'Sepsis (< 1 mes)'], ['pulm', 'Enfermedad pulmonar grave o neumonía (< 1 mes)'], ['epoc', 'Función pulmonar alterada (EPOC)'], ['encMed', 'Paciente médico encamado'], ['acoTHS', 'Anticonceptivos orales o THS'], ['emb', 'Embarazo o puerperio (< 1 mes)']] },
+    { p: 2, t: '2 puntos', items: [['enc72', 'Encamamiento > 72 h'], ['yeso', 'Inmovilización con yeso (< 1 mes)'], ['cvc', 'Acceso venoso central']] },
+    { p: 3, t: '3 puntos', items: [['tevPrev', 'Antecedente de TVP o TEP'], ['famTrom', 'Historia familiar de trombosis'], ['fvl', 'Factor V Leiden'], ['prot', 'Mutación de la protrombina 20210A'], ['aclup', 'Anticoagulante lúpico'], ['acard', 'Anticuerpos anticardiolipina'], ['homoc', 'Homocisteína elevada'], ['trombof', 'Otra trombofilia congénita o adquirida']] },
+    { p: 5, t: '5 puntos', items: [['ictus', 'Ictus (< 1 mes)'], ['fract', 'Fractura de cadera, pelvis o pierna (< 1 mes)'], ['polit', 'Politraumatismo (< 1 mes)'], ['medular', 'Lesión medular aguda (< 1 mes)'], ['artro', 'Artroplastia mayor de miembro inferior']] },
+  ];
+  $('capGroups').innerHTML = CAP.map(g => `<div class="group"><p class="gtitle">${g.t}</p><div class="checks">${g.items.map(([id, l]) => `<label class="ck"><input type="checkbox" id="c_${id}" data-p="${g.p}"> ${l}<span class="pts">+${g.p}</span></label>`).join('')}</div></div>`).join('');
+
+  function load(ex) {
+    ['edad', 'peso', 'talla', 'cr', 'plaq'].forEach(k => $(k).value = ex[k] ?? '');
+    $('sexo').value = ex.sexo || 'F';
+    $('tipo').value = ex.tipo || '';
+    $('fecha').value = todayISO();
+    $('fechaReint').value = '';
+    document.querySelectorAll('form input[type=checkbox]').forEach(c => c.checked = false);
+    $('epidural').checked = !!ex.epidural;
+    document.querySelector('input[name=ac][value=no]').checked = true;
+    calc();
+  }
+
+  function calc() {
+    const edad = num('edad'), peso = num('peso'), talla = num('talla'), cr = num('cr'), plaq = num('plaq');
+    const sexo = $('sexo').value, tipo = $('tipo').value;
+    const epi = $('epidural').checked, reint = $('reint').checked;
+    const ac = document.querySelector('input[name=ac]:checked').value;
+    $('wrapReint').hidden = !reint;
+    $('wrapAltoTromb').hidden = ac === 'no';
+
+    const imc = peso && talla ? peso / Math.pow(talla / 100, 2) : null;
+    const clcr = edad && peso && cr ? ((140 - edad) * peso / (72 * cr)) * (sexo === 'F' ? 0.85 : 1) : null;
+    $('dImc').textContent = imc ? fmt(imc, 1) + ' kg/m²' : '—';
+    $('dClcr').textContent = clcr ? fmt(clcr, 0) + ' ml/min' : '—';
+
+    // Datos imprescindibles: sin ellos, estado vacío
+    const faltan = [[edad, 'edad'], [peso, 'peso'], [talla, 'talla'], [cr, 'creatinina'], [plaq, 'plaquetas'], [tipo || null, 'tipo de intervención']].filter(x => x[0] == null).map(x => x[1]);
+    if (faltan.length) {
+      $('status').className = 'status s-info'; $('status').textContent = 'Faltan datos';
+      $('capNum').textContent = '—'; $('capCat').textContent = '—';
+      $('capAuto').textContent = 'Calculado automáticamente: se completará con los datos del paciente.';
+      $('oDose').textContent = '—'; $('oDoseSub').textContent = '';
+      $('oStart').textContent = '—'; $('oDur').textContent = '—'; $('oDurSub').textContent = '';
+      $('oAlerts').innerHTML = `<li class="a-info" data-mark="i"><span>Para calcular la pauta falta: <b>${faltan.join(', ')}</b>.</span></li>`;
+      $('oReport').value = '';
+      return;
+    }
+
+    const abdPel = ['crs', 'abdpelA', 'abdpelL'].includes(tipo);
+    const mayor = tipo !== 'menor';
+
+    // --- Caprini
+    let cap = 0; const auto = [];
+    if (edad != null) {
+      const a = edad >= 75 ? 3 : edad >= 61 ? 2 : edad >= 41 ? 1 : 0;
+      if (a) { cap += a; auto.push(`edad ${edad >= 75 ? '≥ 75' : edad >= 61 ? '61–74' : '41–60'} (+${a})`); }
+    }
+    if (imc && imc > 25) { cap += 1; auto.push('IMC > 25 (+1)'); }
+    cap += 2; auto.push('cáncer (+2)');
+    if (mayor) { cap += 2; auto.push(tipo === 'abdpelL' ? 'laparoscopia > 45 min (+2)' : 'cirugía mayor > 45 min (+2)'); }
+    else { cap += 1; auto.push('cirugía menor (+1)'); }
+    if ($('tih').checked) { cap += 3; auto.push('TIH (+3)'); }
+    let manual = 0;
+    document.querySelectorAll('#capGroups input:checked').forEach(c => { cap += +c.dataset.p; manual++; });
+    $('capManualCount').textContent = manual;
+    $('capAuto').textContent = 'Calculado automáticamente: ' + auto.join(' · ');
+    const capCat = cap >= 5 ? 'Riesgo alto' : cap >= 3 ? 'Riesgo moderado' : cap >= 1 ? 'Riesgo bajo' : 'Riesgo muy bajo';
+    $('capNum').textContent = cap; $('capCat').textContent = capCat;
+
+    // --- Decisión
+    const A = []; // {k: crit|warn|info|ok, m}
+    const off = ' <span class="tag">OFF-LABEL</span>';
+    let status = ['ok', 'Profilaxis farmacológica'];
+    let dose = '', doseSub = '', start = '', dur = '', durSub = '', report = '';
+    let pharm = true, individual = false;
+
+    // Contraindicaciones
+    if ($('sangrado').checked) { pharm = false; A.push({ k: 'crit', m: '<b>Sangrado activo:</b> no iniciar HBPM. Compresión neumática intermitente y reevaluar a diario.' }); }
+    if ($('tih').checked) { pharm = false; A.push({ k: 'crit', m: '<b>Antecedente de TIH:</b> contraindicadas las heparinas. Valorar una alternativa no heparínica con Hematología.' }); }
+    if (plaq != null && plaq < 50) { pharm = false; A.push({ k: 'crit', m: `<b>Plaquetas ${fmt(plaq)}×10³/µL:</b> evitar profilaxis farmacológica (criterio clínico); medidas mecánicas.` }); }
+    else if (plaq != null && plaq < 80) { individual = true; A.push({ k: 'warn', m: `<b>Plaquetas ${fmt(plaq)}×10³/µL:</b> por debajo de 80.000, individualizar y vigilar (ITAC 2022).` }); }
+    if ($('coag').checked) { individual = true; A.push({ k: 'warn', m: '<b>Coagulopatía no corregida:</b> diferir el inicio hasta corregirla; mientras tanto, medidas mecánicas.' }); }
+    if ($('altoHem').checked) { individual = true; A.push({ k: 'warn', m: '<b>Alto riesgo hemorrágico:</b> individualizar; iniciar en el postoperatorio cuando la hemostasia esté asegurada.' }); }
+
+    const lowRiskMinor = !mayor && cap <= 2;
+    let base = mayor || cap >= 5 ? 4000 : cap >= 3 ? 2000 : 0;
+    if (lowRiskMinor) { pharm = false; }
+
+    let doseTxt = '', every = 24, reportDose = '';
+    if (!pharm) {
+      if (lowRiskMinor && !$('sangrado').checked && !$('tih').checked && !(plaq != null && plaq < 50)) {
+        status = ['info', 'No precisa HBPM'];
+        dose = 'Deambulación precoz'; doseSub = '± medias o compresión neumática';
+        start = 'Desde el postoperatorio inmediato.'; dur = 'Hasta la deambulación completa';
+        report = 'Riesgo tromboembólico bajo (Caprini ' + cap + '). No precisa profilaxis farmacológica al alta. Deambulación precoz.';
+      } else {
+        status = ['crit', 'Farmacológica contraindicada'];
+        dose = 'Compresión neumática intermitente'; doseSub = 'Hasta que pueda iniciarse la HBPM';
+        start = 'Reevaluar a diario la contraindicación.'; dur = '—';
+        report = 'Profilaxis farmacológica contraindicada en este momento. Medidas mecánicas y reevaluación diaria.';
+      }
+    } else {
+      if (individual) status = ['warn', 'Individualizar'];
+      let d = base, note = [];
+      if (mayor && cap < 5) note.push('ITAC 2022: en cirugía oncológica, dosis profiláctica más alta (grado 1A).');
+      // Función renal
+      if (clcr != null && clcr < 15) {
+        d = 0;
+        dose = 'Heparina no fraccionada'; doseSub = 'Dosis profiláctica SC. Inhixa® no recomendada con ClCr < 15 ml/min.';
+        A.push({ k: 'crit', m: `<b>ClCr ${fmt(clcr)} ml/min:</b> Inhixa® no recomendada (ficha técnica). Usar heparina no fraccionada.` });
+        reportDose = 'Heparina no fraccionada a dosis profiláctica';
+      } else if (clcr != null && clcr < 30) {
+        d = 2000; A.push({ k: 'warn', m: `<b>ClCr ${fmt(clcr)} ml/min:</b> ajustar a 2.000 UI cada 24 h (ficha técnica).` });
+        if (imc && imc >= 40) A.push({ k: 'warn', m: '<b>Obesidad + insuficiencia renal:</b> considerar control de anti-Xa.' });
+      } else if (imc && imc >= 40 && d === 4000) {
+        every = 12;
+        A.push({ k: 'warn', m: `<b>IMC ${fmt(imc, 1)}:</b> 4.000 UI cada 12 h, con anti-Xa a las 4 h (0,2–0,5 UI/ml, orientativo).${off}` });
+      }
+      if (d > 0) {
+        const mg = d / 100;
+        dose = `Inhixa® ${fmt(d)} UI (${mg} mg) SC`;
+        doseSub = every === 12 ? 'cada 12 h' : 'cada 24 h';
+        if (every === 12) dose += off;
+        reportDose = `Inhixa® (enoxaparina) ${fmt(d)} UI (${mg} mg) SC cada ${every} h`;
+        if (note.length) doseSub += ' · ' + note.join(' ');
+      }
+      const peqF = sexo === 'F' && peso != null && peso < 45, peqM = sexo === 'M' && peso != null && peso < 57;
+      if (peqF || peqM) A.push({ k: 'warn', m: '<b>Bajo peso:</b> mayor exposición a enoxaparina (ficha técnica). Dosis estándar con vigilancia de sangrado.' });
+      if (edad != null && edad >= 75) A.push({ k: 'info', m: '<b>≥ 75 años:</b> sin ajuste por edad en profilaxis; vigilar la función renal.' });
+
+      // Inicio
+      if (epi || individual || tipo === 'crs') {
+        start = 'Postoperatorio: 6–12 h tras la cirugía, con la hemostasia asegurada.';
+      } else {
+        start = 'Preoperatorio: 12 h antes (ficha técnica, alto riesgo), o postoperatorio a las 6–12 h según protocolo.';
+      }
+      if (epi) {
+        A.push({ k: 'info', m: '<b>Catéter epidural:</b> ≥ 12 h desde la última dosis hasta la punción o la retirada; siguiente dosis ≥ 4 h después de retirarlo.' });
+        if (every === 12) A.push({ k: 'warn', m: '<b>Pauta cada 12 h con catéter:</b> mantener 4.000 UI cada 24 h mientras lleve el catéter y pasar a cada 12 h ≥ 4 h tras retirarlo (ASRA 2018).' });
+      }
+      if (tipo === 'crs') A.push({ k: 'info', m: '<b>CRS-HIPEC:</b> el TP y el TTPa se alteran en el postoperatorio inmediato y se normalizan hacia el 5.º día. Sin sangrado, no contraindica por sí solo la profilaxis.' });
+
+      // Duración
+      const ref = reint && $('fechaReint').value ? $('fechaReint').value : $('fecha').value;
+      if (abdPel) {
+        dur = '28 días';
+        if (ref) { const fin = addDays(ref, 28); durSub = `Hasta el ${fdate(fin)}${reint && $('fechaReint').value ? ', contados desde la última intervención' : ''}.`; }
+        durSub += ' Ficha técnica · ITAC 2022 (1A) · ASCO 2023.';
+      } else if (mayor) {
+        dur = 'Mínimo 7–10 días';
+        durSub = 'Valorar hasta 28 días si hay movilidad reducida, obesidad, TEV previo u otros factores (ASCO 2023).';
+      } else {
+        dur = 'Hasta la deambulación completa';
+      }
+      if (reint) A.push({ k: 'info', m: '<b>Reintervención:</b> suspender la HBPM antes de la cirugía (≥ 12 h si es posible), compresión neumática mientras tanto y reiniciar en cuanto la hemostasia esté asegurada. Dejar escrita la fecha de reinicio. Contar los 28 días desde la última intervención (criterio clínico).' });
+
+      // Informe
+      const finTxt = abdPel && ref ? ` hasta el ${fdate(addDays(ref, 28))} (28 días tras la intervención)` : (mayor ? ' durante un mínimo de 7–10 días' : '');
+      report = `Profilaxis antitrombótica: ${reportDose}${finTxt}.`;
+      if (epi) report += ' Respetar los intervalos con el catéter epidural.';
+      if (ac === 'no') report += ' Se ha enseñado la técnica de autoadministración al paciente o a su cuidador. Control de plaquetas según protocolo.';
+    }
+
+    // Anticoagulación previa
+    if (ac !== 'no') {
+      const nom = { acod: 'ACOD', avk: 'acenocumarol/warfarina', hbpm: 'HBPM terapéutica' }[ac];
+      const pre = { acod: 'suspender según el fármaco y la ClCr (protocolo del hospital)', avk: 'suspender unos 5 días antes y comprobar INR', hbpm: 'última dosis terapéutica 24 h antes' }[ac];
+      A.push({ k: 'warn', m: `<b>Anticoagulado con ${nom}:</b> antes de la cirugía, ${pre}. Después, HBPM profiláctica hasta controlar el sangrado quirúrgico. Al reiniciar su anticoagulación, retirar la HBPM profiláctica: nunca solaparlas.` });
+      if ($('altoTromb').checked) A.push({ k: 'crit', m: '<b>Alto riesgo trombótico:</b> plantear terapia puente con Hematología según el protocolo del hospital.' });
+      if (pharm) report += ` Al reiniciar ${nom}, suspender la HBPM profiláctica.`;
+    }
+    if (pharm) A.push({ k: 'info', m: '<b>Vigilancia:</b> plaquetas basales y periódicas (caída > 50% entre los días 5 y 14 → sospechar TIH).' });
+
+    // Pintar
+    $('status').className = 'status s-' + status[0]; $('status').textContent = status[1];
+    $('oDose').innerHTML = dose || '—'; $('oDoseSub').textContent = doseSub;
+    $('oStart').textContent = start || '—';
+    $('oDur').textContent = dur || '—'; $('oDurSub').textContent = durSub;
+    const order = { crit: 0, warn: 1, info: 2, ok: 3 };
+    const mark = { crit: '!', warn: '!', info: 'i', ok: '✓' };
+    $('oAlerts').innerHTML = A.length ? A.sort((a, b) => order[a.k] - order[b.k]).map(a => `<li class="a-${a.k}" data-mark="${mark[a.k]}"><span>${a.m}</span></li>`).join('') : '<li class="a-ok" data-mark="✓"><span>Sin situaciones especiales.</span></li>';
+    $('oReport').value = report;
+  }
+
+  document.getElementById('f').addEventListener('input', calc);
+  document.getElementById('f').addEventListener('change', calc);
+  document.getElementById('f').addEventListener('submit', e => e.preventDefault());
+  $('btnCopy').addEventListener('click', () => {
+    const t = $('oReport');
+    const done = () => { $('copied').hidden = false; setTimeout(() => $('copied').hidden = true, 1800); };
+    try {
+      navigator.clipboard.writeText(t.value).then(done).catch(() => { t.select(); });
+    } catch (e) { t.select(); }
+  });
+
+  load({});
+})();
+</script>
+
+</body>
+</html>
