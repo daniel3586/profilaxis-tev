@@ -228,7 +228,12 @@ footer b { color: var(--fg); }
 (() => {
   const $ = id => document.getElementById(id);
   const num = id => { const v = parseFloat(String($(id).value).replace(',', '.')); return isFinite(v) ? v : null; };
-  const fmt = (v, d = 0) => v == null ? '—' : v.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d });
+  // Formato español con punto de miles también en cifras de 4 dígitos (4.000 UI)
+  const fmt = (v, d = 0) => {
+    if (v == null) return '—';
+    const [i, f] = Math.abs(v).toFixed(d).split('.');
+    return (v < 0 ? '−' : '') + i.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (f ? ',' + f : '');
+  };
   const fdate = d => d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d; };
   const todayISO = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
