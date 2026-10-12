@@ -219,8 +219,8 @@ footer b { color: var(--fg); }
 
   <footer>
     <div><b>Herramienta de apoyo a la decisión.</b> No sustituye al juicio clínico ni a los protocolos del hospital. No se guarda ningún dato: todo se calcula en este navegador.</div>
-    <div>Basada en la ficha técnica de Inhixa® (CIMA-AEMPS), ITAC 2022 (Lancet Oncol), ASCO 2023 (J Clin Oncol), ASRA 2018 para anestesia neuroaxial y la escala de Caprini (2005). Lo marcado como <span class="tag">OFF-LABEL</span> está fuera de ficha técnica; lo marcado como «criterio clínico» no procede de guías.</div>
-    <div>Versión 1 · octubre 2026</div>
+    <div>Basada en la ficha técnica de Inhixa® (CIMA-AEMPS), SEOM 2023 (Clin Transl Oncol 2024), ITAC 2022 (Lancet Oncol), ASCO 2023 (J Clin Oncol), ESAIC/ESRA 2022 y ASRA 2025 para anestesia neuroaxial, CHEST 2022 para el manejo perioperatorio de la anticoagulación y la escala de Caprini (2005). Lo marcado como <span class="tag">OFF-LABEL</span> está fuera de ficha técnica; lo marcado como «criterio clínico» no procede de guías.</div>
+    <div>Versión 2 · octubre 2026</div>
   </footer>
 </div>
 
@@ -370,12 +370,15 @@ footer b { color: var(--fg); }
       // Inicio
       if (epi || individual || tipo === 'crs') {
         start = 'Postoperatorio: 6–12 h tras la cirugía, con la hemostasia asegurada.';
+      } else if (d === 2000 && clcr != null && clcr >= 30) {
+        start = 'Preoperatorio: 2.000 UI 2 h antes (ficha técnica, riesgo moderado), o postoperatorio según protocolo. No compatible con anestesia neuroaxial.';
       } else {
-        start = 'Preoperatorio: 12 h antes (ficha técnica, alto riesgo), o postoperatorio a las 6–12 h según protocolo.';
+        start = 'Preoperatorio: 12 h antes (ficha técnica, riesgo alto); reinicio ≈ 12 h después. Alternativa: postoperatorio a las 6–12 h según protocolo.';
       }
       if (epi) {
-        A.push({ k: 'info', m: '<b>Catéter epidural:</b> ≥ 12 h desde la última dosis hasta la punción o la retirada; siguiente dosis ≥ 4 h después de retirarlo.' });
-        if (every === 12) A.push({ k: 'warn', m: '<b>Pauta cada 12 h con catéter:</b> mantener 4.000 UI cada 24 h mientras lleve el catéter y pasar a cada 12 h ≥ 4 h tras retirarlo (ASRA 2018).' });
+        const renalEpi = clcr != null && clcr < 30;
+        A.push({ k: renalEpi ? 'warn' : 'info', m: `<b>Catéter epidural:</b> ≥ ${renalEpi ? '24 h (ClCr < 30: intervalo duplicado)' : '12 h'} desde la última dosis profiláctica hasta la punción o la retirada; siguiente dosis ≥ 4 h después de retirarlo. Nunca dosis terapéuticas con el catéter colocado (ESAIC/ESRA 2022, ASRA 2025).` });
+        if (every === 12) A.push({ k: 'warn', m: '<b>Pauta cada 12 h con catéter:</b> mantener 4.000 UI cada 24 h mientras lleve el catéter y pasar a cada 12 h ≥ 4 h tras retirarlo. Si ya recibe cada 12 h, la dosis diaria supera 50 UI/kg y el intervalo antes de la retirada pasa a ≥ 24 h (ESAIC/ESRA 2022).' });
       }
       if (tipo === 'crs') A.push({ k: 'info', m: '<b>CRS-HIPEC:</b> el TP y el TTPa se alteran en el postoperatorio inmediato y se normalizan hacia el 5.º día. Sin sangrado, no contraindica por sí solo la profilaxis.' });
 
@@ -384,7 +387,7 @@ footer b { color: var(--fg); }
       if (abdPel) {
         dur = '28 días';
         if (ref) { const fin = addDays(ref, 28); durSub = `Hasta el ${fdate(fin)}${reint && $('fechaReint').value ? ', contados desde la última intervención' : ''}.`; }
-        durSub += ' Ficha técnica · ITAC 2022 (1A) · ASCO 2023.';
+        durSub += ' Ficha técnica · SEOM 2023 · ITAC 2022 (1A) · ASCO 2023.';
       } else if (mayor) {
         dur = 'Mínimo 7–10 días';
         durSub = 'Valorar hasta 28 días si hay movilidad reducida, obesidad, TEV previo u otros factores (ASCO 2023).';
@@ -403,8 +406,9 @@ footer b { color: var(--fg); }
     // Anticoagulación previa
     if (ac !== 'no') {
       const nom = { acod: 'ACOD', avk: 'acenocumarol/warfarina', hbpm: 'HBPM terapéutica' }[ac];
-      const pre = { acod: 'suspender según el fármaco y la ClCr (protocolo del hospital)', avk: 'suspender unos 5 días antes y comprobar INR', hbpm: 'última dosis terapéutica 24 h antes' }[ac];
-      A.push({ k: 'warn', m: `<b>Anticoagulado con ${nom}:</b> antes de la cirugía, ${pre}. Después, HBPM profiláctica hasta controlar el sangrado quirúrgico. Al reiniciar su anticoagulación, retirar la HBPM profiláctica: nunca solaparlas.` });
+      const altoHemCir = tipo === 'crs' || abdPel || $('altoHem').checked;
+      const pre = { acod: `ACOD anti-Xa (apixabán, rivaroxabán, edoxabán): suspender ${altoHemCir ? '2 días' : '1 día'} antes; dabigatrán, más días según ClCr`, avk: 'suspender 5 días antes y comprobar INR', hbpm: 'última dosis terapéutica ≈ 24 h antes' }[ac];
+      A.push({ k: 'warn', m: `<b>Anticoagulado con ${nom}:</b> antes de la cirugía, ${pre}. Después, HBPM profiláctica en cuanto la hemostasia lo permita. Dosis terapéutica ${altoHemCir ? 'no antes de 48–72 h (cirugía de alto riesgo hemorrágico)' : 'a partir de 24 h'}; al reiniciarla, retirar la profiláctica: nunca solaparlas (CHEST 2022).` });
       if ($('altoTromb').checked) A.push({ k: 'crit', m: '<b>Alto riesgo trombótico:</b> plantear terapia puente con Hematología según el protocolo del hospital.' });
       if (pharm) report += ` Al reiniciar ${nom}, suspender la HBPM profiláctica.`;
     }
